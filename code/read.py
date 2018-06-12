@@ -29,9 +29,21 @@ if __name__ == '__main__':
         logger.warning('input file not supplied; quitting')
         quit()
 
-    data = pd.read_csv(input_file)
-    logger.debug(data.columns.values)
+    columns_of_interest = None
+    columns_of_interest_key = 'columns_of_interest'
+    if columns_of_interest_key in settings.keys():
+        columns_of_interest = settings[columns_of_interest_key]
+    else:
+        logger.warning('required setting %s not supplied. Quitting.' % columns_of_interest_key)
+        quit()
 
+    all_data = pd.read_csv(input_file, usecols=columns_of_interest)
+    logger.debug(all_data.columns.values)
+    logger.debug(all_data.shape)
+    year = columns_of_interest[2]
+
+    data = all_data[all_data[year] == 1]
+    logger.debug(data.shape)
     logger.debug('done')
     finish_time = time.time()
     elapsed_hours, elapsed_remainder = divmod(finish_time - start_time, 3600)
