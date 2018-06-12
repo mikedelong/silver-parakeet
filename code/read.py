@@ -1,12 +1,8 @@
-
-import logging
-import random
-import time
 import json
-import csv
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.linear_model import LinearRegression
+import logging
+import time
+
+import pandas as pd
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -32,6 +28,9 @@ if __name__ == '__main__':
     if input_file is None:
         logger.warning('input file not supplied; quitting')
         quit()
+
+    data = pd.read_csv(input_file)
+    logger.debug(data.columns.values)
 
     logger.debug('done')
     finish_time = time.time()
