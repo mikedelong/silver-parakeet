@@ -48,27 +48,24 @@ if __name__ == '__main__':
     c4 = columns_of_interest[4]
 
     years = sorted(all_data[c4].unique())
-    for year in [1]:
+    logger.debug('years: %s' % str(years))
+    colormap = cm.viridis
+    for year in years:
         data = all_data[all_data[c4] == year]
         logger.debug('data shape: %s' % str(data.shape))
-        logger.debug(data.head(10))
-
-        logger.debug(data['Block'].unique())
-        colormap = cm.viridis
-        uniques = data[c2].unique()
+        uniques = sorted(data[c2].unique())
+        logger.debug('unique blocks: %s' % uniques)
         color_list = [colors.rgb2hex(colormap(item)) for item in np.linspace(0, 0.9, len(uniques))]
-        axes = None
-        for index, c2 in enumerate(uniques):
+        axes = plt.gca()
+        for index, item in enumerate(uniques):
             color = color_list[index]
-            data_to_plot = data[data['Block'] == c2]
-            if index == 0:
-                axes = data_to_plot.plot(kind='scatter', x=c1, y=c3, c=color)
-            else:
-                data_to_plot.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
+            data_to_plot = data[data[c2] == item]
+            data_to_plot.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
 
         output_filename = '../output/year{:02d}.png'.format(year)
         logger.debug('writing scatter plot to %s' % output_filename)
         plt.savefig(output_filename)
+        plt.close()
 
     logger.debug('done')
     finish_time = time.time()
