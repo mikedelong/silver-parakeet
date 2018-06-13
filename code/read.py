@@ -2,17 +2,11 @@ import json
 import logging
 import time
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-
-
-def calculate_age(arg_row, arg_columns):
-    arg_serial = arg_row[arg_columns[0]]
-    arg_year = arg_row[arg_columns[1]]
-    serial_year = arg_serial // 10000
-    local_year = 2000 + serial_year if serial_year < 50 else 1900 + serial_year
-    result = 2018 + arg_year - local_year
-    return result
-
+from matplotlib import cm
+from matplotlib import colors
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -26,7 +20,6 @@ if __name__ == '__main__':
     console_handler.setLevel(logging.DEBUG)
     logger.debug('started')
 
-    settings = dict()
     with open('./settings.json', 'r') as json_fp:
         settings = json.load(json_fp)
         logger.debug('settings: %s' % settings)
@@ -34,8 +27,7 @@ if __name__ == '__main__':
     input_file = None
     if 'input_file' in settings.keys():
         input_file = settings['input_file']
-
-    if input_file is None:
+    else:
         logger.warning('input file not supplied; quitting')
         quit()
 
@@ -50,14 +42,29 @@ if __name__ == '__main__':
     all_data = pd.read_csv(input_file, usecols=columns_of_interest)
     logger.debug(all_data.columns.values)
     logger.debug(all_data.shape)
-    year = columns_of_interest[2]
-    serial = columns_of_interest[0]
+    c1 = columns_of_interest[1]
+    c2 = columns_of_interest[2]
+    c3 = columns_of_interest[3]
+    c4 = columns_of_interest[4]
 
-    data = all_data[all_data[year] == 1]
-    logger.debug(data.shape)
-    data['Age'] = data.apply(lambda row: calculate_age(row, (serial, year)), axis=1)
-    logger.debug(data.shape)
+    data = all_data[all_data[c4] == 1]
+    logger.debug('data shape: %s' % str(data.shape))
     logger.debug(data.head(10))
+
+    logger.debug(data['Block'].unique())
+    colormap = cm.viridis
+    uniques = data[c2].unique()
+    color_list = [colors.rgb2hex(colormap(item)) for item in np.linspace(0, 0.9, len(uniques))]
+    axes = None
+    for index, c2 in enumerate(uniques):
+        color = color_list[index]
+        data_to_plot = data[data['Block'] == c2]
+        if index == 0:
+            axes = data_to_plot.plot(kind='scatter', x=c1, y=c3, c=color)
+        else:
+            data_to_plot.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
+
+    plt.show()
     logger.debug('done')
     finish_time = time.time()
     elapsed_hours, elapsed_remainder = divmod(finish_time - start_time, 3600)
