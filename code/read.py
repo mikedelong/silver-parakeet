@@ -60,7 +60,11 @@ if __name__ == '__main__':
         for index, item in enumerate(uniques):
             color = color_list[index]
             data_to_plot = data[data[c2] == item]
-            data_to_plot.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
+            life_remaining = data_to_plot[data_to_plot[c3] > 0]
+            no_life_remaining = data_to_plot[data_to_plot[c3] == 0]
+            life_remaining.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
+            if len(no_life_remaining) > 0:
+                no_life_remaining.plot(kind='scatter', x=c1, y=c3, ax=axes, c='r')
 
         output_filename = '../output/year{:02d}.png'.format(year)
         logger.debug('writing scatter plot to %s' % output_filename)
