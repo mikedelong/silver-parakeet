@@ -66,7 +66,7 @@ if __name__ == '__main__':
             else:
                 data_to_plot.plot(kind='scatter', x=c1, y=c3, ax=axes, c=color)
 
-        output_filename = '../output/year' + str(year) + '.png'
+        output_filename = '../output/year{:02d}.png'.format(year)
         logger.debug('writing scatter plot to %s' % output_filename)
         plt.savefig(output_filename)
 
